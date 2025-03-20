@@ -19,15 +19,15 @@ function App(): React.JSX.Element {
   const [isFirstModalVisible, setFirstModalVisible] = useState(false);
   const [isSecondModalVisible, setSecondModalVisible] = useState(false);
 
-  const openFirstModal = () => {
+  const openFirstModal = React.useCallback(() => {
     setFirstModalVisible(true);
-  };
+  }, []);
 
-  const closeFirstModal = () => {
+  const closeFirstModal = React.useCallback(() => {
     setFirstModalVisible(false);
-  };
+  }, []);
 
-  const openSecondModalAndCloseFirst = () => {
+  const openSecondModalAndCloseFirst = React.useCallback(() => {
     setFirstModalVisible(false);
     setSecondModalVisible(true);
 
@@ -35,11 +35,9 @@ function App(): React.JSX.Element {
     setTimeout(() => {
       setSecondModalVisible(false);
     }, 100);
-  };
+  }, []);
 
-  const closeSecondModal = () => {
-    setSecondModalVisible(false);
-  };
+  const modalRef = React.useRef(null);
 
   const handleDismiss = React.useCallback(() => {
     console.log('---> handleDismiss', (modalRef.current as any)?._identifier);
@@ -48,8 +46,6 @@ function App(): React.JSX.Element {
   const handleShow = React.useCallback(() => {
       console.log('---> handleShow', (modalRef.current as any)?._identifier);
   }, []);
-
-  const modalRef = React.useRef(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,8 +89,7 @@ function App(): React.JSX.Element {
           onDismiss={handleDismiss}
           animationType="fade"
           transparent={true}
-          visible={isSecondModalVisible}
-          onRequestClose={closeSecondModal}>
+          visible={isSecondModalVisible}>
           <View style={styles.loadingContainer}>
             <View style={styles.loadingIndicator}>
               <Text style={styles.loadingText}>Loading...(second modal)</Text>
