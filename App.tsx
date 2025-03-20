@@ -39,15 +39,8 @@ function App(): React.JSX.Element {
     }, 100);
   }, []);
 
-  const modalRef = React.useRef(null);
-
-  const handleDismiss = React.useCallback(() => {
-    console.log('---> handleDismiss', (modalRef.current as any)?._identifier);
-  }, []);
-
-  const handleShow = React.useCallback(() => {
-      console.log('---> handleShow', (modalRef.current as any)?._identifier);
-  }, []);
+  const modal1Ref = React.useRef(null);
+  const modal2Ref = React.useRef(null);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -58,9 +51,9 @@ function App(): React.JSX.Element {
 
         {/* First Modal */}
         <MyModal
-          ref={modalRef}
-          onShow={handleShow}
-          onDismiss={handleDismiss}
+          ref={modal1Ref}
+          onShow={() => console.log('---> handleShow', (modal1Ref.current as any)?._identifier)}
+          onDismiss={() => console.log('---> handleDismiss', (modal1Ref.current as any)?._identifier)}
           animationType="slide"
           transparent={true}
           visible={isFirstModalVisible}
@@ -86,9 +79,9 @@ function App(): React.JSX.Element {
 
         {/* Loading Modal (Auto-closes after 100ms) */}
         <MyModal
-          ref={modalRef}
-          onShow={handleShow}
-          onDismiss={handleDismiss}
+          ref={modal2Ref}
+          onShow={() => console.log('---> handleShow', (modal2Ref.current as any)?._identifier)}
+          onDismiss={() => console.log('---> handleDismiss', (modal2Ref.current as any)?._identifier)}
           animationType="fade"
           transparent={true}
           visible={isSecondModalVisible}>
