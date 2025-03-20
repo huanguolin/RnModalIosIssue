@@ -30,6 +30,11 @@ function App(): React.JSX.Element {
   const openSecondModalAndCloseFirst = () => {
     setFirstModalVisible(false);
     setSecondModalVisible(true);
+
+    // Automatically close the second modal after 100ms
+    setTimeout(() => {
+      setSecondModalVisible(false);
+    }, 100);
   };
 
   const closeSecondModal = () => {
@@ -44,7 +49,6 @@ function App(): React.JSX.Element {
       console.log('---> handleShow', (modalRef.current as any)?._identifier);
   }, []);
 
-  // 创建一个 ref 来引用 Modal 组件
   const modalRef = React.useRef(null);
 
   return (
@@ -54,7 +58,7 @@ function App(): React.JSX.Element {
           <Text style={styles.buttonText}>Open First Modal</Text>
         </TouchableOpacity>
 
-        {/* First Modal (Upper Half) */}
+        {/* First Modal */}
         <Modal
           ref={modalRef}
           onShow={handleShow}
@@ -65,12 +69,12 @@ function App(): React.JSX.Element {
           onRequestClose={closeFirstModal}>
           <View style={styles.centeredView}>
             <View style={styles.upperModalView}>
-              <Text style={styles.modalTitle}>First Modal (Upper Half)</Text>
+              <Text style={styles.modalTitle}>First Modal</Text>
               <View style={styles.modalButtonContainer}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.leftButton]}
                   onPress={openSecondModalAndCloseFirst}>
-                  <Text style={styles.buttonText}>Open Second Modal</Text>
+                  <Text style={styles.buttonText}>Action with loading</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.rightButton]}
@@ -82,23 +86,18 @@ function App(): React.JSX.Element {
           </View>
         </Modal>
 
-        {/* Second Modal (Lower Half) */}
+        {/* Loading Modal (Auto-closes after 100ms) */}
         <Modal
           ref={modalRef}
           onShow={handleShow}
           onDismiss={handleDismiss}
-          animationType="slide"
+          animationType="fade"
           transparent={true}
           visible={isSecondModalVisible}
           onRequestClose={closeSecondModal}>
-          <View style={styles.centeredView}>
-            <View style={styles.lowerModalView}>
-              <Text style={styles.modalTitle}>Second Modal (Lower Half)</Text>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={closeSecondModal}>
-                <Text style={styles.buttonText}>Close Modal</Text>
-              </TouchableOpacity>
+          <View style={styles.loadingContainer}>
+            <View style={styles.loadingIndicator}>
+              <Text style={styles.loadingText}>Loading...(second modal)</Text>
             </View>
           </View>
         </Modal>
@@ -149,11 +148,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '25%',
   },
-  lowerModalView: {
-    width: '80%',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  loadingIndicator: {
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 20,
+    padding: 30,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -163,8 +167,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    position: 'absolute',
-    bottom: '25%',
+  },
+  loadingText: {
+    marginBottom: 20,
+    fontSize: 22,
+    fontWeight: 'bold',
   },
   modalTitle: {
     marginBottom: 15,
@@ -186,12 +193,6 @@ const styles = StyleSheet.create({
   },
   rightButton: {
     backgroundColor: '#F44336',
-  },
-  closeButton: {
-    backgroundColor: '#F44336',
-    padding: 10,
-    borderRadius: 10,
-    width: '80%',
   },
 });
 
