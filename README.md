@@ -12,6 +12,7 @@ This repository demonstrates a critical iOS-specific bug in React Native's Modal
 3. The second modal's native layer remains on screen as an invisible layer
 4. This invisible layer blocks all user interactions with the underlying UI
 5. The app becomes unresponsive to touch events
+6. **The application is completely unusable and must be force-killed**
 
 ## Steps to Reproduce
 
@@ -34,6 +35,34 @@ This repository demonstrates a critical iOS-specific bug in React Native's Modal
    - Inside the first modal, tap the "Action with loading" button
      (This closes the first modal and opens a second "loading" modal that auto-closes after 100ms)
    - Observe that after both modals disappear, the app's UI is unresponsive
+   - **Note: At this point, the app is completely frozen and the only solution is to force-kill the application**
+
+## Console Output During Reproduction
+
+When reproducing this issue, the following console output is observed:
+
+```sh
+Welcome to React Native DevTools
+Debugger integration: iOS Bridgeless (RCTHost)
+Running "RnModalIosIssue" with {"rootTag":1,"initialProps":{},"fabric":true}
+---> handleShow 0
+---> handleDismiss 1
+---> handleDismiss 0
+```
+
+## Workaround
+
+A workaround for this issue is available in the `workaround` branch. When using the workaround, the console output shows proper modal opening and closing sequence:
+
+```sh
+Welcome to React Native DevTools
+Debugger integration: iOS Bridgeless (RCTHost)
+Running "RnModalIosIssue" with {"rootTag":1,"initialProps":{},"fabric":true}
+---> handleShow 0
+---> handleDismiss 0
+---> handleShow 1
+---> handleDismiss 1
+```
 
 ## Implementation Details
 
@@ -63,3 +92,4 @@ const openSecondModalAndCloseFirst = React.useCallback(() => {
 
 - This issue only occurs on iOS devices
 - The issue appears to be related to how iOS handles the native modal dismissal when rapidly opening and closing multiple modals 
+- **The severity of this bug cannot be overstated - it renders the application completely unusable, requiring a force-kill** 
