@@ -5,113 +5,193 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
+  TouchableOpacity,
+  Modal,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const [isFirstModalVisible, setFirstModalVisible] = useState(false);
+  const [isSecondModalVisible, setSecondModalVisible] = useState(false);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  const openFirstModal = () => {
+    setFirstModalVisible(true);
   };
 
+  const closeFirstModal = () => {
+    setFirstModalVisible(false);
+  };
+
+  const openSecondModalAndCloseFirst = () => {
+    setFirstModalVisible(false);
+    setSecondModalVisible(true);
+  };
+
+  const closeSecondModal = () => {
+    setSecondModalVisible(false);
+  };
+
+  const handleDismiss = React.useCallback(() => {
+    console.log('---> handleDismiss', (modalRef.current as any)?._identifier);
+  }, []);
+
+  const handleShow = React.useCallback(() => {
+      console.log('---> handleShow', (modalRef.current as any)?._identifier);
+  }, []);
+
+  // 创建一个 ref 来引用 Modal 组件
+  const modalRef = React.useRef(null);
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.mainContainer}>
+        <TouchableOpacity style={styles.button} onPress={openFirstModal}>
+          <Text style={styles.buttonText}>Open First Modal</Text>
+        </TouchableOpacity>
+
+        {/* First Modal (Upper Half) */}
+        <Modal
+          ref={modalRef}
+          onShow={handleShow}
+          onDismiss={handleDismiss}
+          animationType="slide"
+          transparent={true}
+          visible={isFirstModalVisible}
+          onRequestClose={closeFirstModal}>
+          <View style={styles.centeredView}>
+            <View style={styles.upperModalView}>
+              <Text style={styles.modalTitle}>First Modal (Upper Half)</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.leftButton]}
+                  onPress={openSecondModalAndCloseFirst}>
+                  <Text style={styles.buttonText}>Open Second Modal</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.rightButton]}
+                  onPress={closeFirstModal}>
+                  <Text style={styles.buttonText}>Close Modal</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Second Modal (Lower Half) */}
+        <Modal
+          ref={modalRef}
+          onShow={handleShow}
+          onDismiss={handleDismiss}
+          animationType="slide"
+          transparent={true}
+          visible={isSecondModalVisible}
+          onRequestClose={closeSecondModal}>
+          <View style={styles.centeredView}>
+            <View style={styles.lowerModalView}>
+              <Text style={styles.modalTitle}>Second Modal (Lower Half)</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={closeSecondModal}>
+                <Text style={styles.buttonText}>Close Modal</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  sectionDescription: {
-    marginTop: 8,
+  button: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  upperModalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    position: 'absolute',
+    top: '25%',
+  },
+  lowerModalView: {
+    width: '80%',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    position: 'absolute',
+    bottom: '25%',
+  },
+  modalTitle: {
+    marginBottom: 15,
     fontSize: 18,
-    fontWeight: '400',
+    fontWeight: 'bold',
   },
-  highlight: {
-    fontWeight: '700',
+  modalButtonContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    width: '48%',
+    padding: 10,
+    borderRadius: 10,
+  },
+  leftButton: {
+    backgroundColor: '#4CAF50',
+  },
+  rightButton: {
+    backgroundColor: '#F44336',
+  },
+  closeButton: {
+    backgroundColor: '#F44336',
+    padding: 10,
+    borderRadius: 10,
+    width: '80%',
   },
 });
 
