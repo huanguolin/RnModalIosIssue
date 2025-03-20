@@ -12,8 +12,10 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Modal,
 } from 'react-native';
+
+// My workaround for Modal
+import MyModal from './MyModal';
 
 function App(): React.JSX.Element {
   const [isFirstModalVisible, setFirstModalVisible] = useState(false);
@@ -55,7 +57,7 @@ function App(): React.JSX.Element {
         </TouchableOpacity>
 
         {/* First Modal */}
-        <Modal
+        <MyModal
           ref={modalRef}
           onShow={handleShow}
           onDismiss={handleDismiss}
@@ -80,10 +82,10 @@ function App(): React.JSX.Element {
               </View>
             </View>
           </View>
-        </Modal>
+        </MyModal>
 
         {/* Loading Modal (Auto-closes after 100ms) */}
-        <Modal
+        <MyModal
           ref={modalRef}
           onShow={handleShow}
           onDismiss={handleDismiss}
@@ -95,7 +97,7 @@ function App(): React.JSX.Element {
               <Text style={styles.loadingText}>Loading...(second modal)</Text>
             </View>
           </View>
-        </Modal>
+        </MyModal>
       </View>
     </SafeAreaView>
   );
