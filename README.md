@@ -1,97 +1,64 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Modal iOS Bug
 
-# Getting Started
+This repository demonstrates a critical iOS-specific bug in React Native's Modal component. When closing a first modal while opening a second modal, and then quickly closing the second modal, the second modal's native layer fails to dismiss properly on iOS, leaving an invisible layer that blocks user interaction with the UI.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Bug Description
 
-## Step 1: Start Metro
+**Platform affected:** iOS only
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+**Behavior:** 
+1. When the first modal is closed while simultaneously opening a second modal
+2. And the second modal is closed shortly after (within ~100ms)
+3. The second modal's native layer remains on screen as an invisible layer
+4. This invisible layer blocks all user interactions with the underlying UI
+5. The app becomes unresponsive to touch events
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Steps to Reproduce
 
-```sh
-# Using npm
-npm start
+1. Clone this repository
+2. Install dependencies:
+   ```sh
+   npm install
+   ```
+3. For iOS, install CocoaPods dependencies:
+   ```sh
+   bundle install
+   bundle exec pod install --project-directory=ios
+   ```
+4. Run the app on an iOS device or simulator:
+   ```sh
+   npm run ios
+   ```
+5. Once the app is running:
+   - Tap the "Open First Modal" button
+   - Inside the first modal, tap the "Action with loading" button
+     (This closes the first modal and opens a second "loading" modal that auto-closes after 100ms)
+   - Observe that after both modals disappear, the app's UI is unresponsive
 
-# OR using Yarn
-yarn start
+## Implementation Details
+
+The issue occurs with the following modal interaction pattern in `App.tsx`:
+
+```tsx
+// When closing first modal and opening second
+const openSecondModalAndCloseFirst = React.useCallback(() => {
+  setFirstModalVisible(false);
+  setSecondModalVisible(true);
+
+  // Automatically close the second modal after 100ms
+  setTimeout(() => {
+    setSecondModalVisible(false);
+  }, 100);
+}, []);
 ```
 
-## Step 2: Build and run your app
+## Environment
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+- React Native: 0.77.1
+- React: 18.3.1
+- iOS Version tested: 16, 18
 
-### Android
+## Additional Notes
 
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- This issue only occurs on iOS devices
+- The issue appears to be related to how iOS handles the native modal dismissal when rapidly opening and closing multiple modals 
