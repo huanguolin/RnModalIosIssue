@@ -57,6 +57,7 @@ const openSecondModalAndCloseFirst = React.useCallback(() => {
 - React Native: 0.77.1
 - React: 18.3.1
 - iOS Version tested: 16, 18
+- New Architecture: Enabled
 
 ## Additional Notes
 
